@@ -1,0 +1,431 @@
+<div class="pagina">
+
+  <div class="brillo brillo-1"></div>
+  <div class="brillo brillo-2"></div>
+  <div class="brillo brillo-3"></div>
+
+  <header class="encabezado">
+
+    <div class="marca">
+
+      <div class="logo">
+        <span>U</span>
+      </div>
+
+      <div>
+        <span class="mini-titulo">S08 | EE2</span>
+
+        <h1>
+          Gestión de <span>Usuarios</span>
+        </h1>
+
+        <p>
+          Administración de usuarios mediante API REST
+        </p>
+      </div>
+
+    </div>
+
+    <div class="api-status">
+      <span class="pulso"></span>
+      API REST CONECTADA
+    </div>
+
+  </header>
+
+
+  @if (mensaje) {
+    <div class="mensaje">
+      <span>✓</span>
+      {{ mensaje }}
+    </div>
+  }
+
+
+  <section class="tarjeta formulario">
+
+    <div class="seccion-cabecera">
+
+      <div class="numero">
+        01
+      </div>
+
+      <div>
+        <span>REGISTRO</span>
+
+        <h2>
+          {{ modoEdicion ? 'Editar usuario' : 'Nuevo usuario' }}
+        </h2>
+      </div>
+
+    </div>
+
+
+    <div class="campos">
+
+      <div class="campo">
+
+        <label>Nombres</label>
+
+        <div class="input-icono">
+
+          <span>👤</span>
+
+          <input
+            type="text"
+            name="firstName"
+            [(ngModel)]="usuario.firstName"
+            placeholder="Ingresa los nombres"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Apellidos</label>
+
+        <div class="input-icono">
+
+          <span>🧑</span>
+
+          <input
+            type="text"
+            name="lastName"
+            [(ngModel)]="usuario.lastName"
+            placeholder="Ingresa los apellidos"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Correo electrónico</label>
+
+        <div class="input-icono">
+
+          <span>✉️</span>
+
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="usuario.email"
+            placeholder="correo@ejemplo.com"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Edad</label>
+
+        <div class="input-icono">
+
+          <span>🎂</span>
+
+          <input
+            type="number"
+            name="age"
+            [(ngModel)]="usuario.age"
+            min="1"
+            max="120"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Género</label>
+
+        <div class="input-icono">
+
+          <span>⚥</span>
+
+          <select
+            name="gender"
+            [(ngModel)]="usuario.gender"
+          >
+
+            <option value="female">Femenino</option>
+            <option value="male">Masculino</option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Nombre de usuario</label>
+
+        <div class="input-icono">
+
+          <span>👤</span>
+
+          <input
+            type="text"
+            name="username"
+            [(ngModel)]="usuario.username"
+            placeholder="nombre_usuario"
+          >
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="acciones-formulario">
+
+      @if (modoEdicion) {
+
+        <button
+          type="button"
+          class="btn cancelar"
+          (click)="limpiar()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="btn principal"
+          (click)="actualizar()"
+        >
+          ✓ Guardar cambios
+        </button>
+
+      } @else {
+
+        <button
+          type="button"
+          class="btn principal"
+          (click)="registrar()"
+        >
+          + Registrar usuario
+        </button>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <section class="tarjeta lista">
+
+    <div class="lista-cabecera">
+
+      <div class="seccion-cabecera">
+
+        <div class="numero">
+          02
+        </div>
+
+        <div>
+
+          <span>CONSULTA</span>
+
+          <h2>
+            Usuarios registrados
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="contador">
+
+        <strong>
+          {{ usuarios.length }}
+        </strong>
+
+        <span>
+          usuarios
+        </span>
+
+      </div>
+
+    </div>
+
+
+    @if (cargando) {
+
+      <div class="cargando">
+
+        <div class="spinner"></div>
+
+        <p>
+          Cargando usuarios...
+        </p>
+
+      </div>
+
+    } @else {
+
+      <div class="tabla-contenedor">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>ID</th>
+              <th>PERFIL</th>
+              <th>USUARIO</th>
+              <th>CORREO</th>
+              <th>EDAD</th>
+              <th>GÉNERO</th>
+              <th>ACCIONES</th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @for (u of usuarios; track u.id) {
+
+              <tr>
+
+                <td>
+
+                  <span class="id">
+                    #{{ u.id }}
+                  </span>
+
+                </td>
+
+
+                <td>
+
+                  <div class="avatar">
+
+                    {{ u.firstName.substring(0, 1) }}{{ u.lastName.substring(0, 1) }}
+
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <div class="usuario">
+
+                    <strong>
+                      {{ u.firstName }} {{ u.lastName }}
+                    </strong>
+
+                    <small>
+                      Usuario: {{ u.username }}
+                    </small>
+
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <span class="correo">
+                    {{ u.email }}
+                  </span>
+
+                </td>
+
+
+                <td>
+
+                  <span class="edad">
+                    {{ u.age }}
+                  </span>
+
+                </td>
+
+
+                <td>
+
+                  @if (u.gender === 'female') {
+
+                    <span class="genero femenino">
+                      ♀ Femenino
+                    </span>
+
+                  } @else {
+
+                    <span class="genero masculino">
+                      ♂ Masculino
+                    </span>
+
+                  }
+
+                </td>
+
+
+                <td>
+
+                  <div class="acciones">
+
+                    <button
+                      type="button"
+                      class="btn-accion editar"
+                      (click)="editar(u)"
+                    >
+                      ✎ Editar
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-accion eliminar"
+                      (click)="eliminar(u)"
+                    >
+                      × Eliminar
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+  </section>
+
+
+  <footer>
+
+    <span>Angular</span>
+    <span>•</span>
+    <span>REST API</span>
+    <span>•</span>
+    <span>CRUD</span>
+
+  </footer>
+
+</div>
