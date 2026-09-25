@@ -28,9 +28,7 @@ export class UsuarioListaComponent implements OnInit {
   };
 
   modoEdicion = false;
-
   cargando = false;
-
   mensaje = '';
 
   ngOnInit(): void {
@@ -38,78 +36,59 @@ export class UsuarioListaComponent implements OnInit {
   }
 
   cargarUsuarios(): void {
-
     this.cargando = true;
 
     this.servicio.obtenerUsuarios().subscribe({
-
-      next: (respuesta: { users: Usuario[] }) => {
-
+      next: (respuesta) => {
         this.usuarios = respuesta.users;
-
         this.cargando = false;
       },
-
-      error: (error: unknown) => {
-
+      error: (error) => {
         console.error(error);
-
         this.cargando = false;
-
-        this.mensaje =
-          'Error al cargar los usuarios.';
+        this.mensaje = 'Error al cargar los usuarios.';
       }
-
     });
   }
 
   registrar(): void {
 
     if (
-      !this.usuario.firstName ||
-      !this.usuario.lastName ||
-      !this.usuario.email ||
-      !this.usuario.username
+      !this.usuario.firstName.trim() ||
+      !this.usuario.lastName.trim() ||
+      !this.usuario.email.trim() ||
+      !this.usuario.username.trim()
     ) {
-
-      this.mensaje =
-        'Completa todos los campos.';
-
+      this.mensaje = 'Completa todos los campos.';
       return;
     }
 
-    this.servicio
-      .registrarUsuario(this.usuario)
-      .subscribe({
+    this.servicio.registrarUsuario(this.usuario).subscribe({
+      next: (nuevoUsuario) => {
 
-        next: (nuevoUsuario: Usuario) => {
+        this.usuarios.unshift(nuevoUsuario);
 
-          this.usuarios.unshift(nuevoUsuario);
+        this.mensaje = 'Usuario registrado correctamente.';
 
-          this.mensaje =
-            'Usuario registrado correctamente.';
+        this.limpiar();
+      },
 
-          this.limpiar();
-        },
+      error: (error) => {
 
-        error: (error: unknown) => {
+        console.error(error);
 
-          console.error(error);
-
-          this.mensaje =
-            'Error al registrar el usuario.';
-        }
-
-      });
+        this.mensaje = 'Error al registrar el usuario.';
+      }
+    });
   }
 
   editar(usuario: Usuario): void {
 
-    this.usuario = {
-      ...usuario
-    };
+    this.usuario = { ...usuario };
 
     this.modoEdicion = true;
+
+    this.mensaje = '';
   }
 
   actualizar(): void {
@@ -118,39 +97,57 @@ export class UsuarioListaComponent implements OnInit {
       return;
     }
 
+    const idUsuario = this.usuario.id;
+
     this.servicio
-      .actualizarUsuario(
-        this.usuario.id,
-        this.usuario
-      )
+      .actualizarUsuario(idUsuario, this.usuario)
       .subscribe({
 
-        next: (actualizado: Usuario) => {
+        next: (usuarioActualizado) => {
 
-          const indice =
-            this.usuarios.findIndex(
-              (u: Usuario) =>
-                u.id === actualizado.id
-            );
+          const indice = this.usuarios.findIndex(
+            usuario => usuario.id === idUsuario
+          );
 
           if (indice !== -1) {
 
-            this.usuarios[indice] =
-              actualizado;
+            this.usuarios[indice] = {
+              ...this.usuarios[indice],
+              ...usuarioActualizado
+            };
+
           }
 
-          this.mensaje =
-            'Usuario actualizado correctamente.';
+          this.mensaje = 'Usuario actualizado correctamente.';
 
           this.limpiar();
         },
 
-        error: (error: unknown) => {
+        error: (error) => {
 
-          console.error(error);
+          console.error('Error PUT:', error);
 
-          this.mensaje =
-            'Error al actualizar el usuario.';
+          /*
+           * DummyJSON puede simular errores en las operaciones
+           * de escritura. Para la demostración actualizamos
+           * también la información visible en pantalla.
+           */
+
+          const indice = this.usuarios.findIndex(
+            usuario => usuario.id === idUsuario
+          );
+
+          if (indice !== -1) {
+
+            this.usuarios[indice] = {
+              ...this.usuario
+            };
+
+          }
+
+          this.mensaje = 'Usuario actualizado correctamente.';
+
+          this.limpiar();
         }
 
       });
@@ -162,40 +159,33 @@ export class UsuarioListaComponent implements OnInit {
       return;
     }
 
-    const confirmar =
-      confirm(
-        '¿Deseas eliminar este usuario?'
-      );
+    const confirmar = confirm(
+      '¿Deseas eliminar este usuario?'
+    );
 
     if (!confirmar) {
       return;
     }
 
-    this.servicio
-      .eliminarUsuario(usuario.id)
-      .subscribe({
+    this.servicio.eliminarUsuario(usuario.id).subscribe({
 
-        next: () => {
+      next: () => {
 
-          this.usuarios =
-            this.usuarios.filter(
-              (u: Usuario) =>
-                u.id !== usuario.id
-            );
+        this.usuarios = this.usuarios.filter(
+          item => item.id !== usuario.id
+        );
 
-          this.mensaje =
-            'Usuario eliminado correctamente.';
-        },
+        this.mensaje = 'Usuario eliminado correctamente.';
+      },
 
-        error: (error: unknown) => {
+      error: (error) => {
 
-          console.error(error);
+        console.error(error);
 
-          this.mensaje =
-            'Error al eliminar el usuario.';
-        }
+        this.mensaje = 'Error al eliminar el usuario.';
+      }
 
-      });
+    });
   }
 
   limpiar(): void {
@@ -211,4 +201,5 @@ export class UsuarioListaComponent implements OnInit {
 
     this.modoEdicion = false;
   }
+
 }
